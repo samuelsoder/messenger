@@ -133,7 +133,7 @@ class MessengerDB:
         except OperationalError as err:
             return Err(f'Failed to delete items with ids {message_ids} from table {self.table_name}, got error: {err}')
 
-    def get_all(self) -> Result[list[Message, str]]:
+    def get_all(self) -> Result[list[Message], str]:
         """
         Fetches all message in DB (mainly for testing)
         :return: Result with list of rows (id, user_id, timestamp, sender, message) and string if failed
