@@ -106,16 +106,16 @@ class MessengerDB:
         cursor.close()
         return res
 
-    def delete_message(self, message_id):
+    def delete_messages(self, message_ids):
         """
         Deletes message with given id from table.
-        :param message_id: String, id of message to delete
+        :param message_ids: List of strings, ids of messages to delete
         :return: None
         """
         table = Table(self.table_name)
         command = Query \
             .from_(self.table_name) \
-            .where(table.id == message_id) \
+            .where(table.id.isin(message_ids)) \
             .delete()
 
         self.connection.execute(command.get_sql())

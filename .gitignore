@@ -1,4 +1,6 @@
 .idea/
+
+# Local instance to the DB
 messenger
 
 **/__pycache__/
