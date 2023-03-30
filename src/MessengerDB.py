@@ -8,7 +8,7 @@ from sqlite3 import OperationalError
 from pypika import Query, Table, Column
 
 
-def convert_to_timestamp(date, end_of_day=False):
+def convert_to_timestamp(date: str, end_of_day: bool = False):
     """
     Converts date in yyyy-mm-dd format to timestamp (seconds since epoch).
     :param date: String on format yyyy-mm-dd
@@ -64,7 +64,8 @@ class MessengerDB:
         except OperationalError as err:
             return Err(f'Failed to close connection to table {self.table_name}, got error: {err}')
 
-    def insert_message(self, recipient_id, sender_id, message, date_sent=None) -> Result[str, str]:
+    def insert_message(self, recipient_id: str, sender_id: str, message: str, date_sent: str = None) \
+            -> Result[str, str]:
         """
         Creates uuid and inserts message into database
         :param recipient_id: String, id of recipient
@@ -87,7 +88,8 @@ class MessengerDB:
         except OperationalError as err:
             return Err(f'Failed to add message to table {self.table_name}, got error: {err}')
 
-    def select_from_recipient(self, recipient_id, from_date=None, to_date=None) -> Result[list[Message], str]:
+    def select_from_recipient(self, recipient_id: str, from_date: str = None, to_date: str = None) \
+            -> Result[list[Message], str]:
         """
         Selects entries from the table for the given recipient between given dates
         :param recipient_id: String, id of recipient
@@ -114,7 +116,32 @@ class MessengerDB:
         except OperationalError as err:
             return Err(f'Failed to select from table {self.table_name}, got error: {err}')
 
-    def delete_messages(self, message_ids: str) -> Result[str, str]:
+    def patch_message(self, message_id: str, message_patch: MessagePatch) -> Result[str, str]:
+        """
+        Patches message with given id.
+        :param message_id: String
+        :param message_patch: MessagePatch
+        :return: Result with status
+        """
+        table = Table(self.table_name)
+        attrs = ['recipient_id', 'timestamp', 'sender_id', 'message']
+
+        not_none_attrs = filter(lambda attr: getattr(message_patch, attr) is not None, attrs)
+        updates = map(lambda attr: Query.update(table)
+                      .set(table[attr], getattr(message_patch, attr))
+                      .where(table.id == message_id),
+                      not_none_attrs
+                      )
+
+        try:
+            for q in updates:
+                self.connection.execute(q.get_sql())
+            self.connection.commit()
+            return Ok(f'Successfully updated message with id {message_id} in table {self.table_name}')
+        except OperationalError as err:
+            return Err(f'Failed to update item with id {message_id} from table {self.table_name}, got error: {err}')
+
+    def delete_messages(self, message_ids: list[str]) -> Result[str, str]:
         """
         Deletes message with given id from table.
         :param message_ids: List of strings, ids of messages to delete
