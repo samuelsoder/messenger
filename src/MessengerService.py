@@ -5,9 +5,13 @@ from src.models.models import MessageRequest, Message, MessagePatch
 
 
 class MessengerService:
+    """Class for handling any needed business logic, connects the endpoints with the DB."""
 
     def __init__(self, db):
         self.db: MessengerDB = db
+
+    def get_all(self):
+        return self.db.get_all()
 
     def get_messages(self, recipient_id: str, from_date: str, to_date: str) -> Result[list[Message], str]:
         return self.db.select_from_recipient(recipient_id, from_date, to_date)

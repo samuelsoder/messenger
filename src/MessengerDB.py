@@ -25,6 +25,7 @@ def convert_to_timestamp(date: str, end_of_day: bool = False):
 
 
 class MessengerDB:
+    """Class for creating and managing a SQLite DB"""
 
     def __init__(self, table_name):
         self.table_name = table_name
