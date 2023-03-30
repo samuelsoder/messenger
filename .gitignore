@@ -1,1 +1,4 @@
 .idea/
+messenger
+
+**/__pycache__/
