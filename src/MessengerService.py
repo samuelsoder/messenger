@@ -17,6 +17,11 @@ def to_message(message_id: str, recipient_id: str, timestamp: float, sender_id: 
 
 
 def map_to_messages_dict(db_rows: list[Union[str, float]]) -> list[dict]:
+    """
+    Maps the rows returned from the DB to dicts.
+    :param db_rows: List of lists in format ('id', 'recipient_id', 'timestamp', 'sender_id', 'message')
+    :return: List of dicts
+    """
     return list(map(lambda row: to_message(*row), db_rows))
 
 
