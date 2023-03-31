@@ -2,7 +2,9 @@ from datetime import datetime
 import sqlite3
 import time
 import uuid
-from src.models.models import Message, MessagePatch
+from typing import Union
+
+from src.models.models import MessagePatch
 from result import Ok, Err, Result
 from sqlite3 import OperationalError
 from pypika import Query, Table, Column
@@ -90,7 +92,7 @@ class MessengerDB:
             return Err(f'Failed to add message to table {self.table_name}, got error: {err}')
 
     def select_from_recipient(self, recipient_id: str, from_date: str = None, to_date: str = None) \
-            -> Result[list[Message], str]:
+            -> Result[list[Union[str, float]], str]:
         """
         Selects entries from the table for the given recipient between given dates
         :param recipient_id: String, id of recipient
@@ -161,7 +163,7 @@ class MessengerDB:
         except OperationalError as err:
             return Err(f'Failed to delete items with ids {message_ids} from table {self.table_name}, got error: {err}')
 
-    def get_all(self) -> Result[list[Message], str]:
+    def get_all(self) -> Result[list[Union[str, float]], str]:
         """
         Fetches all message in DB (mainly for testing)
         :return: Result with list of rows (id, recipient_id, timestamp, sender_id, message) and string if failed

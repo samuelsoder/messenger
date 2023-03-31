@@ -10,6 +10,7 @@ class MessageRequest(BaseModel):
     sender_id: str
     recipient_id: str
     message: str
+    date_sent: Union[str, None] = None
 
 
 class MessagePatch(BaseModel):
@@ -21,13 +22,3 @@ class MessagePatch(BaseModel):
     timestamp: Union[float, None] = None
     message: Union[str, None] = None
 
-
-class Message:
-    """
-    Model for messages stored in the DB and returned through GET requests
-    """
-    id: str
-    sender_id: str
-    recipient_id: str
-    timestamp: float
-    message: str
