@@ -127,14 +127,17 @@ class MessengerDB:
         :return: Result with status
         """
         table = Table(self.table_name)
-        attrs = ['recipient_id', 'timestamp', 'sender_id', 'message']
+        patch_attrs = ['recipient_id', 'date_sent', 'sender_id', 'message']
 
-        not_none_attrs = filter(lambda attr: getattr(message_patch, attr) is not None, attrs)
-        updates = map(lambda attr: Query.update(table)
-                      .set(table[attr], getattr(message_patch, attr))
-                      .where(table.id == message_id),
-                      not_none_attrs
-                      )
+        not_none_attrs = filter(lambda attr: getattr(message_patch, attr) is not None, patch_attrs)
+
+        def update_command(attr):
+            column = table[attr if attr != 'date_sent' else 'timestamp']
+            new_val = getattr(message_patch, attr) if attr != 'date_sent' \
+                else convert_to_timestamp(getattr(message_patch, 'date_sent'))
+            return Query.update(table).set(column, new_val).where(table.id == message_id)
+
+        updates = map(lambda attr: update_command(attr), not_none_attrs)
 
         try:
             for q in updates:

@@ -19,6 +19,6 @@ class MessagePatch(BaseModel):
     """
     sender_id: Union[str, None] = None
     recipient_id: Union[str, None] = None
-    timestamp: Union[float, None] = None
+    date_sent: Union[str, None] = None
     message: Union[str, None] = None
 
