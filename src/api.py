@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Response, status
+from typing import Annotated
+
+from fastapi import FastAPI, Response, status, Query
 
 from src.MessengerService import MessengerService
 from src.bootstraper import init_db
@@ -42,7 +44,7 @@ async def get_messages(response: Response, recipient_id: str, from_date: str = N
         return get_result.value
 
 
-@app.post("/messenger/", status_code=201)
+@app.post("/messenger/", status_code=200)
 async def post_message(response: Response, message: MessageRequest):
     """
     Endpoint for posting new message
@@ -76,14 +78,14 @@ async def patch_message(response: Response, message_id: str, patch: MessagePatch
 
 
 @app.delete("/messenger/", status_code=200)
-async def delete_messages(response: Response, *message_ids: str):
+async def delete_message(response: Response, ids: Annotated[list[str], Query()]):
     """
     Endpoint for deleting messages provided as queryparams
     :param response: Response, object for modifying response
-    :param message_ids: List of strings, ids of messages to delete
+    :param ids: String, id of message to delete
     :return:
     """
-    delete_result = service.delete_messages(*message_ids)
+    delete_result = service.delete_messages(ids)
     if delete_result.is_ok():
         return delete_result.value
     else:
